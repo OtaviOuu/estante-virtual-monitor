@@ -3,6 +3,7 @@ package scraper
 import (
 	"net/http"
 	"os"
+	"strings"
 
 	browser "github.com/EDDYCJY/fake-useragent"
 	"github.com/PuerkitoBio/goquery"
@@ -30,7 +31,7 @@ func (s *Scraper) Parse(url string) (*goquery.Document, error) {
 		return nil, err
 	}
 
-	addHeaders(req)
+	applyDefaultHeaders(req)
 
 	resp, err := client.Do(req)
 	if err != nil {
@@ -46,9 +47,22 @@ func (s *Scraper) Parse(url string) (*goquery.Document, error) {
 	return doc, nil
 }
 
+func (s *Scraper) GetBooksLinks(doc *goquery.Document) ([]string, error) {
+	var books []string
+
+	doc.Find("a.product-item__link.smarthint-tracking-card").Each(func(i int, s *goquery.Selection) {
+		link, _ := s.Attr("href")
+		link = strings.TrimSpace(link)
+
+		books = append(books, link)
+	})
+
+	return books, nil
+}
+
 // ""bypass"" captcha
 // Por algum motivo isso funciona ¯\_(ツ)_/¯
-func addHeaders(req *http.Request) *http.Request {
+func applyDefaultHeaders(req *http.Request) *http.Request {
 	req.Header.Set("User-Agent", browser.Random())
 	req.Header.Set("Accept-Language", "en-US,en;q=0.9")
 	req.Header.Set("Accept-Encoding", "gzip, deflate, br")
