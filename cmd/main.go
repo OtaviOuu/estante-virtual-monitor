@@ -49,7 +49,7 @@ func parseBookCategory(page int) {
 	})
 
 	for i := 1; i <= page; i++ {
-		c.Visit("https://www.estantevirtual.com.br/busca?categoria=ciencias-exatas&page=" + fmt.Sprint(i))
+		c.Visit(fmt.Sprintf("https://www.estantevirtual.com.br/busca?categoria=ciencias-exatas&page=%d", i))
 	}
 	c.Wait()
 

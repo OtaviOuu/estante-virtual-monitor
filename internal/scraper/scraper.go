@@ -5,7 +5,7 @@ import (
 	"os"
 	"strings"
 
-	browser "github.com/EDDYCJY/fake-useragent"
+	ua "github.com/EDDYCJY/fake-useragent"
 	"github.com/PuerkitoBio/goquery"
 )
 
@@ -63,7 +63,7 @@ func (s *Scraper) GetBooksLinks(doc *goquery.Document) ([]string, error) {
 // ""bypass"" captcha
 // Por algum motivo isso funciona ¯\_(ツ)_/¯
 func applyDefaultHeaders(req *http.Request) *http.Request {
-	req.Header.Set("User-Agent", browser.Random())
+	req.Header.Set("User-Agent", ua.Random())
 	req.Header.Set("Accept-Language", "en-US,en;q=0.9")
 	req.Header.Set("Accept-Encoding", "gzip, deflate, br")
 	req.Header.Set("Connection", "keep-alive")

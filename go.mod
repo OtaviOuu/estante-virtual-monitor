@@ -3,13 +3,13 @@ module github.com/OtaviOuu/estante-virtual-monitor
 go 1.23.5
 
 require (
+	github.com/EDDYCJY/fake-useragent v0.2.0
 	github.com/PuerkitoBio/goquery v1.10.1
 	github.com/gocolly/colly v1.2.0
 	github.com/joho/godotenv v1.5.1
 )
 
 require (
-	github.com/EDDYCJY/fake-useragent v0.2.0 // indirect
 	github.com/andybalholm/cascadia v1.3.3 // indirect
 	github.com/antchfx/htmlquery v1.3.4 // indirect
 	github.com/antchfx/xmlquery v1.4.4 // indirect
