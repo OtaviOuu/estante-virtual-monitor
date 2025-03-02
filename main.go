@@ -53,7 +53,7 @@ func GetNewBooks() (books []Book) {
 	category := "ciencias-exatas"
 
 	// f"https://www.estantevirtual.com.br/busca?q={category}&sort=new-releases" 😢
-	mathBooksUrl := baseUrl + "/busca?q=" + category + "&sort=new-releases"
+	mathBooksUrl := baseUrl + "/busca?categoria=" + category + "&sort=new-releases"
 	doc, err := GetPage(mathBooksUrl)
 	if err != nil {
 		log.Fatal(err)
