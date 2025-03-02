@@ -3,7 +3,6 @@ package main
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -75,19 +74,22 @@ func GetNewBooks() (books []Book) {
 			Link:      s.Find("a").AttrOr("href", "Sem link"),
 		}
 		finds = append(finds, book)
-		log.Printf("Title: %s\nImage: %s\nAuthor: %s\nLink: %s\nPublisher: %s\nPrice: %s\n\n", book.Title, book.Image, book.Author, book.Link, book.Publisher, book.Price)
+		log.Println(book.Title + " | " + book.Price)
 	})
 	return finds
 }
 
 func main() {
+	api_url := "https://api.telegram.org"
+
 	godotenv.Load()
 
 	books := GetNewBooks()
 	botToken := os.Getenv("BOT_TOKEN")
 	chatID := os.Getenv("CHANNEL_ID")
 	for _, book := range books {
-		link := fmt.Sprintf("estantevirtual.com.br%s", book.Link)
+		link := "estantevirtual.com.br" + book.Link
+
 		caption := `
 			*` + book.Title + `*
 			` + book.Author + `
@@ -108,12 +110,13 @@ func main() {
 			log.Fatal("Error marshalling JSON: ", err)
 		}
 
-		req, err := http.NewRequest("POST", fmt.Sprintf("https://api.telegram.org/bot%s/sendPhoto", botToken), bytes.NewBuffer(jsonData))
+		sendPhotoURL := api_url + "/bot" + botToken + "/sendPhoto"
+		req, err := http.NewRequest("POST", sendPhotoURL, bytes.NewBuffer(jsonData))
 		if err != nil {
 			log.Fatal("Error creating request: ", err)
 		}
-		req.Header.Set("Content-Type", "application/json")
 
+		req.Header.Set("Content-Type", "application/json")
 		res, err := http.DefaultClient.Do(req)
 		if err != nil {
 			log.Fatal("Error sending request: ", err)
