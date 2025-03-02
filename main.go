@@ -23,18 +23,18 @@ type Book struct {
 	Price     string // 😁
 }
 
-func GetNewBooks() (books []Book) {
-	mathBooksUrl := "https://www.estantevirtual.com.br/busca?categoria=ciencias-exatas&sort=new-releases"
-	req, err := http.NewRequest("GET", mathBooksUrl, nil)
+func GetPage(url string) (*goquery.Document, error) {
+	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
-	req.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3")
+
+	req.Header.Set("User-Agent", "Mozilla/5.0")
 	req.Header.Set("Cookie", "qualquer coisa aq vai funcionar")
 
 	res, err := http.DefaultClient.Do(req)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 	defer res.Body.Close()
 	if res.StatusCode != 200 {
@@ -46,18 +46,33 @@ func GetNewBooks() (books []Book) {
 		log.Fatal(err)
 	}
 
+	return doc, nil
+}
+
+func GetNewBooks() (books []Book) {
+	baseUrl := "https://www.estantevirtual.com.br"
+	category := "ciencias-exatas"
+
+	// f"https://www.estantevirtual.com.br/busca?q={category}&sort=new-releases" 😢
+	mathBooksUrl := baseUrl + "/busca?q=" + category + "&sort=new-releases"
+	doc, err := GetPage(mathBooksUrl)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	finds := []Book{}
 	doc.Find(".product-item.product-list__item").Each(func(_ int, s *goquery.Selection) {
-		price := strings.TrimSpace(s.Find(".product-item__text--darken").Text())
-		publisher := strings.TrimSpace(s.Find(".product-item__publishing").Text())
 		author := strings.TrimSpace(s.Find(".product-item__author").Text())
+		publisher := strings.TrimSpace(s.Find(".product-item__publishing").Text())
+		price := strings.TrimSpace(s.Find(".product-item__text--darken").Text())
+
 		book := Book{
-			Title:     s.Find("a").AttrOr("title", "Sem título"),
-			Image:     s.Find("img").AttrOr("data-src", "Sem imagem"),
 			Author:    author,
-			Link:      s.Find("a").AttrOr("href", "Sem link"),
 			Publisher: publisher,
 			Price:     price,
+			Title:     s.Find("a").AttrOr("title", "Sem título"),
+			Image:     s.Find("img").AttrOr("data-src", "Sem imagem"),
+			Link:      s.Find("a").AttrOr("href", "Sem link"),
 		}
 		finds = append(finds, book)
 		log.Printf("Title: %s\nImage: %s\nAuthor: %s\nLink: %s\nPublisher: %s\nPrice: %s\n\n", book.Title, book.Image, book.Author, book.Link, book.Publisher, book.Price)
@@ -73,7 +88,13 @@ func main() {
 	chatID := os.Getenv("CHANNEL_ID")
 	for _, book := range books {
 		link := fmt.Sprintf("estantevirtual.com.br%s", book.Link)
-		caption := fmt.Sprintf("*%s*\n%s\n%s\n%s\n\n[Link](%s)", book.Title, book.Author, book.Publisher, book.Price, link)
+		caption := `
+			*` + book.Title + `*
+			` + book.Author + `
+			` + book.Publisher + `
+			` + book.Price + `
+			[Link](` + link + `)
+		`
 
 		data := map[string]interface{}{
 			"chat_id":    chatID,
