@@ -1,5 +1,6 @@
-## Funcionalidades
+![Screencastfrom06-04-2025222558-ezgif com-video-to-gif-converter](https://github.com/user-attachments/assets/2f798ee8-2831-4254-b1e9-a365b855b143)
 
+## Funcionalidades
 - Web scraping do site Estante Virtual
 - Coleta de informações detalhadas de livros recém-lançados
 - Envio automático das informações para um canal do Telegram
